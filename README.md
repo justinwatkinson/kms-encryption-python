@@ -1,8 +1,8 @@
 This is a simiple python script that will allow you to use the
 
 # Prerequisites:
-    - Set up your Amazon environnment to already be ready for AWS API calls (e.g. add .aws directory or execute aws configure from CLI)
-    - Set up an AWS Dynamo DB with a hash key:  env-variable-name (type is String)
+- Set up your Amazon environnment to already be ready for AWS API calls (e.g. add .aws directory or execute aws configure from CLI)
+- Set up an AWS Dynamo DB with a hash key:  env-variable-name (type is String)
     
 #Usage:
 ##Decrypt -
