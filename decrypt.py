@@ -8,7 +8,19 @@ import argparse
 #Pads the data to suit the AES-256 encryption requirements
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
-unpad = lambda s : s[0:-ord(s[-1])]
+unpad = lambda s : s[0:-ord(str(s[-1]))]
+#unpad = lambda s : s[0:-s[-1]]
+
+'''
+def pad(data):
+    length = 16 - (len(data) % 16)
+    data += bytes([length])*length
+    return data
+
+def unpad(data):
+    data = data[:-data[-1]]
+    return data
+'''
 
 #set up immutable variables
 kms = boto3.client('kms')
@@ -18,7 +30,7 @@ def local_decrypt(ciphertext, key):
     iv = ciphertext[:AES.block_size]
     cipher = AES.new(key, AES.MODE_ECB, iv)
     plaintext = cipher.decrypt(ciphertext[AES.block_size:])
-    return unpad(plaintext)
+    return unpad(plaintext.decode('ASCII'))
 
 def decrypt_kms_data(encrypted_data):
     #print('Start KMS Decrypt: ' + str(datetime.datetime.now()))
