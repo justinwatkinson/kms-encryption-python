@@ -1,4 +1,4 @@
-This is a simiple python script that will allow you to use the
+This is a simiple python script that will allow you to use the Amazon KMS service in conjunction with AWS DynamoDB to store variables in encrypted form in a database that is easy to query and never has to store a key on disk.
 
 # Prerequisites:
 - Set up your Amazon environnment to already be ready for AWS API calls (e.g. add .aws directory or execute aws configure from CLI)
