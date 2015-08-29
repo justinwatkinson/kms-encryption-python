@@ -9,36 +9,24 @@ import argparse
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
 unpad = lambda s : s[0:-ord(str(s[-1]))]
-#unpad = lambda s : s[0:-s[-1]]
 
-'''
-def pad(data):
-    length = 16 - (len(data) % 16)
-    data += bytes([length])*length
-    return data
-
-def unpad(data):
-    data = data[:-data[-1]]
-    return data
-'''
-
-#set up immutable variables
+#set up AWS client variables
 kms = boto3.client('kms')
 ddb = boto3.client('dynamodb')
 
+#Used to decrypt locally on this machine using the key decrypted from KMS
 def local_decrypt(ciphertext, key):
     iv = ciphertext[:AES.block_size]
     cipher = AES.new(key, AES.MODE_ECB, iv)
     plaintext = cipher.decrypt(ciphertext[AES.block_size:])
     return unpad(plaintext.decode('ASCII'))
 
+#Used to decrypt the data key pulled from DynamoDB
 def decrypt_kms_data(encrypted_data):
-    #print('Start KMS Decrypt: ' + str(datetime.datetime.now()))
     decrypted = kms.decrypt(CiphertextBlob=encrypted_data)
-    #print('End KMS Decrypt: ' + str(datetime.datetime.now()))
-    #print('Decrypted Text: ',decrypted['Plaintext'])
     return decrypted
 
+#Pull data from DynamoDB
 def read_from_ddb(env_var_name):
     response = ddb.get_item(
         TableName=ddb_table_name,
@@ -50,10 +38,9 @@ def read_from_ddb(env_var_name):
     )
     return response
 
+#Pulls/Formats the data from DDB
 def get_encrypted_parameter(p):
-    #app.logger.info(p)
     returned_variable_dict = read_from_ddb(p)
-    #app.logger.error(returned_variable_dict)
     returned_db_value = returned_variable_dict['Item']['env-variable-enc-value']['B']
     returned_db_kms_encrypted_key = returned_variable_dict['Item']['env-variable-enc-kms-key']['B']
     kms_decrypted_key = decrypt_kms_data(returned_db_kms_encrypted_key)['Plaintext']
