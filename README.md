@@ -21,7 +21,7 @@ This is a simiple python script that will allow you to use the Amazon KMS servic
                             key)
                             
 ##Encrypt:
-usage: encrypt.py [-h] -p PARAMETER_KEY -v PARAMETER_VALUE -t DDB_TABLE -k KMS_KEY
+    usage: encrypt.py [-h] -p PARAMETER_KEY -v PARAMETER_VALUE -t DDB_TABLE -k KMS_KEY
 
     Encrypts a KMS DynamoDB key
     
