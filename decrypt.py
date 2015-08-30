@@ -27,20 +27,20 @@ def decrypt_kms_data(encrypted_data):
     return decrypted
 
 #Pull data from DynamoDB
-def read_from_ddb(env_var_name):
+def read_from_ddb():
     response = ddb.get_item(
         TableName=ddb_table_name,
         Key={
             'env-variable-name': {
-                'S': env_var_name
+                'S': parameter_key
             }
         }
     )
     return response
 
 #Pulls/Formats the data from DDB
-def get_encrypted_parameter(p):
-    returned_variable_dict = read_from_ddb(p)
+def get_encrypted_parameter():
+    returned_variable_dict = read_from_ddb()
     returned_db_value = returned_variable_dict['Item']['env-variable-enc-value']['B']
     returned_db_kms_encrypted_key = returned_variable_dict['Item']['env-variable-enc-kms-key']['B']
     kms_decrypted_key = decrypt_kms_data(returned_db_kms_encrypted_key)['Plaintext']
@@ -60,5 +60,6 @@ if __name__ == '__main__':
     #Decrypt the value after validation
     boto_master_key_id = args.kms_key
     ddb_table_name = args.ddb_table
-    value = get_encrypted_parameter(args.parameter_key)
-    print(value)
+    parameter_key = args.parameter_key
+    cleartext_value = get_encrypted_parameter()
+    print(cleartext_value)
