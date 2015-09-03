@@ -21,7 +21,8 @@ This is a simiple python script that will allow you to use the Amazon KMS servic
                             key)
                             
 ##Encrypt:
-    usage: encrypt.py [-h] -p PARAMETER_KEY -v PARAMETER_VALUE -t DDB_TABLE -k KMS_KEY
+    usage: encrypt.py [-h] -p PARAMETER_KEY [-v PARAMETER_VALUE]
+                  [-f PARAMETER_FILE] -t DDB_TABLE -k KMS_KEY
 
     Encrypts a KMS DynamoDB key
     
@@ -30,7 +31,11 @@ This is a simiple python script that will allow you to use the Amazon KMS servic
       -p PARAMETER_KEY, --parameter_key PARAMETER_KEY
                             Name of Parameter to put into DynamoDB
       -v PARAMETER_VALUE, --parameter_value PARAMETER_VALUE
-                            Value of Parameter to put into DynamoDB
+                            Value of Parameter to put into DynamoDB. One of this
+                            or parameter_file required.
+      -f PARAMETER_FILE, --parameter_file PARAMETER_FILE
+                            Location of file you want to upload (e.g. SSL private
+                            key). One of this or parameter_value required.
       -t DDB_TABLE, --ddb_table DDB_TABLE
                             Name of existing DynamoDB Table to use in look-up
       -k KMS_KEY, --kms_key KMS_KEY
