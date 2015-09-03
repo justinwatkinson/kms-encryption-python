@@ -1,4 +1,4 @@
-#!/bin/python
+#!/usr/bin/python3
 import boto3
 import datetime
 from Crypto import Random

@@ -1,9 +1,10 @@
-#!/bin/python
+#!/usr/bin/python3
 import boto3
 import datetime
 from Crypto import Random
 from Crypto.Cipher import AES
 import argparse
+import base64
 
 #Pads the data to suit the AES-256 encryption requirements
 BS = 16
@@ -15,7 +16,7 @@ kms = boto3.client('kms')
 ddb = boto3.client('dynamodb')
 
 def local_encrypt(message, key, key_size=256):
-    message = pad(message)
+    message = pad(str(message))
     iv = Random.new().read(AES.block_size)
     cipher = AES.new(key, AES.MODE_ECB, iv)
     return iv + cipher.encrypt(message)
@@ -55,9 +56,8 @@ def validate_arguments():
     return True
 
 def read_value_from_file():
-    with open(parameter_file, 'rb') as f:
+    with open(parameter_file, 'r') as f:
         read_value=f.read()
-        #print(read_data)
     f.closed
     return read_value
 
