@@ -10,10 +10,6 @@ BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
 unpad = lambda s : s[0:-ord(str(s[-1]))]
 
-#set up AWS client variables
-kms = boto3.client('kms')
-ddb = boto3.client('dynamodb')
-
 #Used to decrypt locally on this machine using the key decrypted from KMS
 def local_decrypt(ciphertext, key):
     iv = ciphertext[:AES.block_size]
@@ -52,10 +48,16 @@ def get_encrypted_parameter():
 if __name__ == '__main__':
     #Check user input
     parser = argparse.ArgumentParser(description='Decrypts a KMS DynamoDB key')
-    parser.add_argument('-p','--parameter_key', help='Name of Parameter in DynamoDB',required=True)
-    parser.add_argument('-t','--ddb_table', help='Name of existing DynamoDB Table to use in look-up',required=True)
     parser.add_argument('-k','--kms_key', help='Name of AWS KMS Customer Master Key (ex: alias/test-key)',required=True)
+    parser.add_argument('-p','--parameter_key', help='Name of Parameter in DynamoDB',required=True)
+    parser.add_argument('-r','--region', help='Name of AWS Region to use for both KMS and DynamoDB',required=False)
+    parser.add_argument('-t','--ddb_table', help='Name of existing DynamoDB Table to use in look-up',required=True)
     args = parser.parse_args()
+    
+    #set up and configure AWS client variables
+    #NOTE:  If args.region is empty, it'll still use the local .aws if you've configured the AWS CLI, for example.
+    kms = boto3.client('kms', region_name=args.region)
+    ddb = boto3.client('dynamodb', region_name=args.region)
     
     #Decrypt the value after validation
     boto_master_key_id = args.kms_key

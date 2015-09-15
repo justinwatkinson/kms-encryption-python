@@ -11,10 +11,6 @@ BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS) 
 unpad = lambda s : s[0:-ord(str(s[-1]))]
 
-#set up AWS client variables
-kms = boto3.client('kms')
-ddb = boto3.client('dynamodb')
-
 def local_encrypt(message, key, key_size=256):
     message = pad(str(message))
     iv = Random.new().read(AES.block_size)
@@ -66,11 +62,12 @@ def read_value_from_file():
 if __name__ == '__main__':
     #Check user input
     parser = argparse.ArgumentParser(description='Encrypts a KMS DynamoDB key')
-    parser.add_argument('-p','--parameter_key', help='Name of Parameter to put into DynamoDB',required=True)
-    parser.add_argument('-v','--parameter_value', help='Value of Parameter to put into DynamoDB.    One of this or parameter_file required.',required=False)
     parser.add_argument('-f','--parameter_file', help='Location of file you want to upload (e.g. SSL private key).  One of this or parameter_value required.',required=False)
-    parser.add_argument('-t','--ddb_table', help='Name of existing DynamoDB Table to use in look-up',required=True)
     parser.add_argument('-k','--kms_key', help='Name of AWS KMS Customer Master Key (ex: alias/test-key)',required=True)
+    parser.add_argument('-p','--parameter_key', help='Name of Parameter to put into DynamoDB',required=True)
+    parser.add_argument('-r','--region', help='Name of AWS Region to use for both KMS and DynamoDB',required=False)
+    parser.add_argument('-t','--ddb_table', help='Name of existing DynamoDB Table to use in look-up',required=True)
+    parser.add_argument('-v','--parameter_value', help='Value of Parameter to put into DynamoDB.    One of this or parameter_file required.',required=False)
     args = parser.parse_args()
     
     #Decrypt the value after validation - sets global variables
@@ -79,6 +76,11 @@ if __name__ == '__main__':
     parameter_key = args.parameter_key
     parameter_value = args.parameter_value
     parameter_file = args.parameter_file
+    
+    #set up and configure AWS client variables
+    #NOTE:  If args.region is empty, it'll still use the local .aws if you've configured the AWS CLI, for example.
+    kms = boto3.client('kms', region_name=args.region)
+    ddb = boto3.client('dynamodb', region_name=args.region)
     
     if validate_arguments():
         #Should only get invoked if there is no parameter value specified
